@@ -1,0 +1,73 @@
+<?php
+
+/*
+ * hook_form_FORM_ID_alter for alter "Site Information Setting" form
+ */
+function custom_form_system_site_information_settings_alter(&$form, &$form_state, $form_id) {
+    $form['site_api'] = array( // creating field set
+        '#type' => 'fieldset', 
+        '#title' => t('Site API'), 
+        '#weight' => 5, 
+        '#collapsible' => FALSE, 
+        '#collapsed' => FALSE,
+    );
+    $form['site_api']['site_api_key'] = array( // API key
+        '#type' => 'textfield',
+        '#title' => t('Site API Key'),
+        '#default_value' => variable_get('siteapikey','No API Key yet'),
+        '#required' => TRUE,
+    );
+    
+    $form['actions']['submit']['#value'] = t('Update Configuration'); // Update Submit button 
+    $form['#submit'][] = 'system_settings_form_api_submit'; // adding one submit function 
+    return $form;
+}
+
+function system_settings_form_api_submit($form, &$form_state) { // submit handler
+    variable_set('siteapikey',$form_state['values']['site_api_key']);    
+    drupal_set_message('API key saved successfully');
+}
+
+
+/*
+ * Implementation of HOOK_MENU
+ */
+function custom_menu() {
+    $items['page_json/%/%'] = array(
+        'title' => t('JSON Representation'),
+        'type' => MENU_CALLBACK,
+        'page callback' => 'json_represent_api_nid',
+        'page arguments' => array(1,2),
+        'access callback' => 'page_json_access',
+        'access arguments' => array(1,2),
+    ); 
+    return $items;
+}
+
+/*
+ * Access callback for HOOK_MENU
+ */
+function page_json_access($api, $nid){
+    if($api == variable_get('siteapikey')){
+        $node = node_load($nid);
+        if($node &&  ($node->type == 'page')){
+             return TRUE;
+        }
+        else{
+            return false;
+        }
+    }
+    else{
+        return false;
+    }
+}
+
+
+/*
+ * Page callback for JSON representation
+ */
+function json_represent_api_nid($api, $nid){
+    $node = node_load($nid);
+    $jason_node = drupal_json_encode($node);
+    return $jason_node;
+}

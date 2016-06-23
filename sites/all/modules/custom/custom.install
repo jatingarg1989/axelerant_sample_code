@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Custom module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function custom_uninstall() {
+    variable_del('siteapikey');
+}
+
+function custom_install() {
+  variable_set('siteapikey','No API Key yet');
+}

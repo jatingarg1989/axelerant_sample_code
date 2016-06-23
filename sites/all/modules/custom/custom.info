@@ -1,0 +1,8 @@
+name = Custom
+description = "custom module for coding"
+core = 7.x
+
+; Information added on 2016-06-23
+version = "7.x"
+core = "7.x"
+
